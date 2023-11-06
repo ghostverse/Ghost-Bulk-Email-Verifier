@@ -16,24 +16,24 @@ verified_emails = []
 def checkemail(s):
     pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
     if re.match(pattern, s):
-        return '\033[32m' + "Valid Email" + '\033[0m'
+        return "Valid Email"
     else:
-        return '\033[31m' + "Invalid Email" + '\033[0m'
+        return "Invalid Email"
 
 def disposableEmail(email):
     result = is_disposable_email.check(email)
     if result:
-        return '\033[31m' + "Yes" + '\033[0m'
+        return "Yes"
     else:
-        return '\033[32m' + "No" + '\033[0m'
+        return "No"
 
 def emailValidate(email):
     try:
         emailinfo = validate_email(email, check_deliverability=True)
         email = emailinfo.normalized
-        return '\033[32m' + "Yes" + '\033[0m', "-"
+        return "Yes", "-"
     except EmailNotValidError as e:
-        return '\033[31m' + "No" + '\033[0m', str(e)
+        return "No", str(e)
 
 # Read email list from the input CSV file provided by the user
 with open(input_csv_file, encoding='utf-8-sig') as csvfile:
@@ -51,4 +51,4 @@ with open(output_file, mode='w', newline='') as output_csv:
     writer.writerow(['Email', 'Validate Email', 'Domain Address', 'Disposable Email', 'Deliverable Email', 'Reason'])
     writer.writerows(verified_emails)
 
-print('\033[32m' + "Successful." + '\033[0m', f"Verified emails saved to {output_file}")
+print('\033[32mSuccessful. Verified emails saved to ' + output_file + '\033[0m')
