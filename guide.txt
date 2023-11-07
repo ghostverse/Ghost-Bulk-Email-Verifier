@@ -1,4 +1,4 @@
-To Install the necessary libraries for the script to function, use the command below.
+To install the necessary libraries for the script to work, you can use the command below.
 ############################################################################################
 pip install -r install.txt
 
@@ -8,10 +8,11 @@ To run the Bulk Email Verifier script, use the command below.
 python3 bulkEmailVerifier.py
 
 
-To extract the Deliverable Emails from the validated email leads, use the command below.
-############################################################################################
+To extract the Deliverable Emails from the validated email leads, you can use the command below.
+#################################################################################################
 python3 extractDeliverable.py
 
+Ensure your email list input CSV files have an Email header.
 
 
 I'm a software engineer and certified email marketing specialist with over 7 years of experience. I specialize in building email SMTP servers for sending millions of emails and hitting inboxes on all email clients like Gmail, Outlook, Yahoo, Office365, AOL, and others. I've developed custom Python software for enterprise-level email marketing and integrated it with Amazon SES to scale capabilities efficiently while maintaining top performance and cost-efficiency. Let's take your email marketing to the next level together.
