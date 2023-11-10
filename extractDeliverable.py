@@ -21,8 +21,10 @@ try:
     with open(input_csv_file, encoding='utf-8-sig') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            deliverable = row['Deliverable Email']
-            if deliverable == 'Yes':
+            validate_email = row['Validate Email']
+            deliverable_email = row['Deliverable Email']
+            
+            if validate_email == 'Valid Email' and deliverable_email == 'Yes':
                 email = row['Email']
                 deliverable_emails.append(email)
 except Exception as e:
