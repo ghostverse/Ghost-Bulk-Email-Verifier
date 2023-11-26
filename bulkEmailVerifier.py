@@ -1,47 +1,61 @@
 # For tools contact me: https://t.me/ghostverse
 import csv
-import re
-import email
 import is_disposable_email
 from email_validator import validate_email, EmailNotValidError
 import os
 import time
+import re
 
-# Ask the user for the input CSV file
-input_csv_file = input("Enter the name of the input CSV file (e.g., email.csv): ")
+# Function to validate a batch of emails
+def validate_batch(email_batch, writer):
+    for email in email_batch:
+        is_valid_email = check_email(email)
+        is_disposable_mail = disposable_email(email)
+        is_deliverable_mail, reason = validate_email_format(email)
 
-# Ask the user for the output file and its extension
-output_file = input("Enter the name of the output file (e.g., Verified_Email.csv): ")
+        domain_address = email.split('@')[1] if '@' in email else ''
+        writer.writerow([email, is_valid_email, domain_address, is_disposable_mail, is_deliverable_mail, reason])
 
-# Initialize the list for verified emails
-verified_emails = []
-
-def checkemail(s):
-    pattern = r'\b[A-Za-z0.9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+# Function to check the format of an email
+def check_email(s):
+    pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,7}\b'
     if re.match(pattern, s):
         return "Valid Email"
     else:
         return "Invalid Email"
 
-def disposableEmail(email):
+# Function to check if an email is disposable
+def disposable_email(email):
     result = is_disposable_email.check(email)
-    if result:
-        return "Yes"
-    else:
-        return "No"
+    return "Yes" if result else "No"
 
-def emailValidate(email):
+# Function to validate the format and deliverability of an email
+def validate_email_format(email):
     try:
-        emailinfo = validate_email(email, check_deliverability=True)
-        email = emailinfo.normalized
+        email_info = validate_email(email, check_deliverability=False)
+        email_normalized = email_info.normalized
         return "Yes", "-"
     except EmailNotValidError as e:
         return "No", str(e)
 
-# Check if the input CSV file exists
-if not os.path.exists(input_csv_file):
-    print('\033[31m' + f"Error: The input file '{input_csv_file}' does not exist." + '\033[0m')
+# Ask the user for the input CSV file with validation
+while True:
+    input_csv_file = input("Enter the name of the input CSV file (e.g., email.csv): ")
+    if os.path.exists(input_csv_file):
+        break
+    else:
+        print('\033[31m' + f"Error: The input file '{input_csv_file}' does not exist." + '\033[0m')
+
+# Ask the user for the output file and its extension
+output_file = input("Enter the name of the output file (e.g., Verified_Email.csv): ")
+
+# Check if the output directory exists
+output_dir = os.path.dirname(os.path.abspath(output_file))
+if not os.path.exists(output_dir):
+    print('\033[31m' + f"Error: The output directory for file '{output_file}' does not exist." + '\033[0m')
     exit(1)
+
+batch_size = 1000  # Adjust the batch size based on your system's capabilities
 
 animation_messages = ['Validating emails   ', 'Validating emails.  ', 'Validating emails.. ', 'Validating emails...']
 
@@ -52,21 +66,30 @@ for i in range(30):
 
 # Write the verified emails to the output CSV file
 try:
-    with open(output_file, mode='w', newline='') as output_csv:  # Use 'w' mode to write, overwriting the file
+    with open(output_file, mode='w', newline='') as output_csv:
         writer = csv.writer(output_csv)
         writer.writerow(['Email', 'Validate Email', 'Domain Address', 'Disposable Email', 'Deliverable Email', 'Reason'])  # Write the header row
 
         # Read email list from the input CSV file provided by the user
         with open(input_csv_file, encoding='utf-8-sig') as csvfile:
             reader = csv.DictReader(csvfile)
+            email_batch = []
+            
             for row in reader:
                 email = row['Email']
-                isvalidemail = checkemail(email)
-                isDisposableMail = disposableEmail(email)
-                isDeliverableMail, isReason = emailValidate(email)
-                verified_emails.append([email, isvalidemail, email.split('@')[1], isDisposableMail, isDeliverableMail, isReason])
+                email_batch.append(email)
 
-        writer.writerows(verified_emails)
+                if len(email_batch) == batch_size:
+                    validate_batch(email_batch, writer)
+                    email_batch = []
+
+            # Process the last batch (if any)
+            if email_batch:
+                validate_batch(email_batch, writer)
+
+except PermissionError:
+    print('\033[31m' + f"Error: Permission denied while writing to the file '{output_file}'." + '\033[0m')
+    exit(1)
 except Exception as e:
     print('\033[31m' + f"Error writing to the output CSV file: {str(e)}" + '\033[0m')
     exit(1)
