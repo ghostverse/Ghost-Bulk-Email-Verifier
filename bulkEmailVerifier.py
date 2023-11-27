@@ -1,7 +1,7 @@
 # For tools contact me: https://t.me/ghostverse
 import csv
 import is_disposable_email
-from email_validator import validate_email, EmailNotValidError
+from email_validator import validate_email, EmailNotValidError, EmailSyntaxError
 import os
 import time
 import re
@@ -11,10 +11,11 @@ def validate_batch(email_batch, writer):
     for email in email_batch:
         is_valid_email = check_email(email)
         is_disposable_mail = disposable_email(email)
+        is_catch_all_domain = validate_email_catch_all(email)
         is_deliverable_mail, reason = validate_email_format(email)
 
         domain_address = email.split('@')[1] if '@' in email else ''
-        writer.writerow([email, is_valid_email, domain_address, is_disposable_mail, is_deliverable_mail, reason])
+        writer.writerow([email, is_valid_email, domain_address, is_disposable_mail, is_catch_all_domain, is_deliverable_mail, reason])
 
 # Function to check the format of an email
 def check_email(s):
@@ -32,11 +33,23 @@ def disposable_email(email):
 # Function to validate the format and deliverability of an email
 def validate_email_format(email):
     try:
-        email_info = validate_email(email, check_deliverability=False)
+        email_info = validate_email(email, check_deliverability=True)
         email_normalized = email_info.normalized
         return "Yes", "-"
-    except EmailNotValidError as e:
-        return "No", str(e)
+    except EmailSyntaxError as e_syntax:
+        return "No (Syntax)", str(e_syntax)
+    except EmailNotValidError as e_not_valid:
+        return "No (Not Deliverable)", str(e_not_valid)
+    except Exception as e:
+        return "Error", str(e)
+
+# Function to check if an email belongs to a catch-all domain
+def validate_email_catch_all(email):
+    try:
+        is_catch_all = validate_email_catch_all(email)
+        return "Yes" if is_catch_all else "No"
+    except Exception as e:
+        return "Error", str(e)
 
 # Ask the user for the input CSV file with validation
 while True:
@@ -68,7 +81,7 @@ for i in range(30):
 try:
     with open(output_file, mode='w', newline='') as output_csv:
         writer = csv.writer(output_csv)
-        writer.writerow(['Email', 'Validate Email', 'Domain Address', 'Disposable Email', 'Deliverable Email', 'Reason'])  # Write the header row
+        writer.writerow(['Email', 'Validate Email', 'Domain Address', 'Disposable Email', 'Catch-All Domain', 'Deliverable Email', 'Reason'])  # Write the header row
 
         # Read email list from the input CSV file provided by the user
         with open(input_csv_file, encoding='utf-8-sig') as csvfile:
