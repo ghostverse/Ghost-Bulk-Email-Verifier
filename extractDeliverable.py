@@ -22,9 +22,11 @@ try:
         reader = csv.DictReader(csvfile)
         for row in reader:
             validate_email = row['Validate Email']
+            disposable_email = row['Disposable Email']
+            catch_all_domain = row['Catch-All Domain']
             deliverable_email = row['Deliverable Email']
-            
-            if validate_email == 'Valid Email' and deliverable_email == 'Yes':
+
+            if validate_email == 'Valid Email' and disposable_email == 'No' and catch_all_domain == 'Yes' and deliverable_email == 'Yes':
                 email = row['Email']
                 deliverable_emails.append(email)
 except Exception as e:
