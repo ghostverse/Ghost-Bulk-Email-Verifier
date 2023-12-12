@@ -13,7 +13,7 @@ def validate_batch(email_batch, writer):
         is_disposable_mail = disposable_email(email)
         is_deliverable_mail, reason = validate_email_format(email)
 
-        domain_address = email.split('@')[1] if '@' in email else ''
+        domain_address = email.split('@')[1] if '@' in email and len(email.split('@')) > 1 else ''
         writer.writerow([email, is_valid_email, domain_address, is_disposable_mail, is_deliverable_mail, reason])
 
 # Function to check the format of an email
