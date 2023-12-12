@@ -9,12 +9,15 @@ import re
 # Function to validate a batch of emails
 def validate_batch(email_batch, writer):
     for email in email_batch:
-        is_valid_email = check_email(email)
-        is_disposable_mail = disposable_email(email)
-        is_deliverable_mail, reason = validate_email_format(email)
+        try:
+            is_valid_email = check_email(email)
+            is_disposable_mail = disposable_email(email)
+            is_deliverable_mail, reason = validate_email_format(email)
 
-        domain_address = email.split('@')[1] if '@' in email and len(email.split('@')) > 1 else ''
-        writer.writerow([email, is_valid_email, domain_address, is_disposable_mail, is_deliverable_mail, reason])
+            domain_address = email.split('@')[1] if '@' in email else ''
+            writer.writerow([email, is_valid_email, domain_address, is_disposable_mail, is_deliverable_mail, reason])
+        except Exception as e:
+            print(f"Error processing email '{email}': {str(e)}")
 
 # Function to check the format of an email
 def check_email(s):
@@ -78,14 +81,17 @@ try:
         with open(input_csv_file, encoding='utf-8-sig') as csvfile:
             reader = csv.DictReader(csvfile)
             email_batch = []
-            
-            for row in reader:
-                email = row['Email']
-                email_batch.append(email)
 
-                if len(email_batch) == batch_size:
-                    validate_batch(email_batch, writer)
-                    email_batch = []
+            for row in reader:
+                # Split the content of the 'Email' column based on spaces
+                emails_in_cell = row['Email'].split()
+
+                for email in emails_in_cell:
+                    email_batch.append(email)
+
+                    if len(email_batch) == batch_size:
+                        validate_batch(email_batch, writer)
+                        email_batch = []
 
             # Process the last batch (if any)
             if email_batch:
