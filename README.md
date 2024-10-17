@@ -38,4 +38,4 @@ This script offers a range of benefits, including time savings, reduced errors, 
 12. **Email Extraction**:
     - Extracting deliverable emails is important for businesses to focus their communication efforts on addresses that are more likely to receive and open messages. This can lead to improved email marketing ROI.
 
-**If you need an email verifier that accurately validates all email domains—including both business and free domains such as @gmail.com, @outlook.com, @yahoo.com, and @aol.com, etc—to check if the email truly exists, contact me for the paid version.**
+**If you need an email verifier that accurately validates all email domains—including both business and free domains such as @gmail.com, @outlook.com, @yahoo.com, and @aol.com, etc—to check if the email truly exists, contact me for the paid version. https://t.me/Ghostverse**
